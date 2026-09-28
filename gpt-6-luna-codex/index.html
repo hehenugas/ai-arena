@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d7e7e5" />
+    <meta name="description" content="A little floating island to explore, from golden hour to rain after dark." />
+    <title>Pocket World — a tiny place above the clouds</title>
+  </head>
+  <body>
+    <main id="app">
+      <div id="scene" aria-label="Interactive floating island scene"></div>
+      <aside id="panel" class="panel" aria-label="Pocket World controls">
+        <header class="panel-heading">
+          <div class="heading-copy">
+            <span class="eyebrow">A little place above the clouds</span>
+            <h1>Pocket <span>World</span></h1>
+            <p class="intro">A tiny island, entirely yours.</p>
+          </div>
+          <div class="heading-tools">
+            <span id="weather-status" class="weather-status"><span class="status-dot"></span><span>Clear</span></span>
+            <button id="collapse-panel" class="collapse-button" type="button" aria-expanded="true" aria-controls="panel-content" aria-label="Collapse controls">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
+            </button>
+          </div>
+        </header>
+
+        <div id="panel-content" class="panel-content">
+          <section class="control-section time-section" aria-labelledby="time-label">
+            <div class="section-topline">
+              <label id="time-label" for="time-slider">Time of day</label>
+              <output id="time-readout" for="time-slider" aria-live="polite">16:00</output>
+            </div>
+            <input id="time-slider" class="range-control time-range" type="range" min="0" max="24" step="0.05" value="16" aria-label="Time of day" />
+            <div class="range-captions" aria-hidden="true"><span>Midnight</span><span>Morning</span><span>Midday</span><span>Evening</span></div>
+          </section>
+
+          <section class="control-section" aria-labelledby="weather-label">
+            <div class="section-topline">
+              <span id="weather-label" class="control-label">Weather</span>
+              <span class="section-note">Make it a little rainy</span>
+            </div>
+            <div class="segmented" role="group" aria-label="Weather">
+              <button class="weather-choice is-active" type="button" data-weather="clear" aria-pressed="true">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.3" /><path d="M10 1.8v2M10 16.2v2M1.8 10h2m12.4 0h2M4.2 4.2l1.4 1.4m8.8 8.8 1.4 1.4m0-11.6-1.4 1.4m-8.8 8.8-1.4 1.4" /></svg>
+                Clear
+              </button>
+              <button class="weather-choice" type="button" data-weather="rain" aria-pressed="false">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.1 11.5a4 4 0 0 1 .6-8 5.2 5.2 0 0 1 9.8 2.1 3 3 0 0 1-.2 5.9H5.1Z" /><path d="m7 14.5-.6 1.8m4.2-1.8-.6 1.8m4.2-1.8-.6 1.8" /></svg>
+                Rain
+              </button>
+            </div>
+          </section>
+
+          <section class="control-section" aria-labelledby="wind-label">
+            <div class="section-topline">
+              <label id="wind-label" for="wind-slider">Breeze</label>
+              <output id="wind-readout" for="wind-slider">30%</output>
+            </div>
+            <input id="wind-slider" class="range-control wind-range" type="range" min="0" max="100" step="1" value="30" aria-label="Wind strength" />
+            <div class="wind-hints" aria-hidden="true"><span>Still</span><span>Gusty</span></div>
+          </section>
+
+          <section class="lights-section">
+            <div class="lights-copy">
+              <span class="lights-title">Cottage lights</span>
+              <span class="lights-caption">A warm glow after dusk</span>
+            </div>
+            <label class="switch" for="lights-toggle">
+              <input id="lights-toggle" type="checkbox" role="switch" aria-label="Cottage lights" />
+              <span class="switch-track"><span class="switch-knob"></span></span>
+              <span class="switch-state" id="lights-state">Off</span>
+            </label>
+          </section>
+
+          <div class="panel-actions">
+            <button id="reset-button" class="reset-button" type="button">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.2 9.2A6.8 6.8 0 1 1 4.8 14M3 4.7v4.8h4.8" /></svg>
+              Reset world
+            </button>
+            <span class="reset-hint">Back to 16:00</span>
+          </div>
+
+          <p class="interaction-hint"><span class="hint-mark" aria-hidden="true"></span>Drag to explore · scroll to zoom · tap the cottage for lights</p>
+        </div>
+        <span class="mobile-prompt" aria-hidden="true">Open controls</span>
+      </aside>
+      <div id="fatal" class="fatal-message" role="alert" hidden>
+        <div class="fatal-card">
+          <span class="eyebrow">Pocket World</span>
+          <h2>This browser can’t open the island</h2>
+          <p>WebGL could not start. Try a browser with hardware acceleration enabled, then reload the page.</p>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

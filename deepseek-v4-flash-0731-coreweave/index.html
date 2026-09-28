@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Pocket World — a tiny floating island diorama." />
+    <title>Pocket World</title>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="webgl-error" hidden>
+      <div class="error-card">
+        <h1>Pocket World</h1>
+        <p>
+          This miniature world needs WebGL — a 3D graphics feature that isn’t
+          available in this browser right now. Please enable hardware acceleration
+          (or try a current version of Chrome, Edge, Firefox or Safari).
+        </p>
+      </div>
+    </div>
+
+    <aside id="panel" aria-label="Pocket World controls">
+      <div class="panel-head">
+        <h1 class="title">🏝️ Pocket World</h1>
+        <button id="collapseBtn" class="icon-btn" type="button" aria-expanded="true" aria-label="Collapse panel">—</button>
+      </div>
+
+      <div class="panel-body">
+        <div class="field">
+          <label for="timeSlider" class="field-label">
+            <span>Time of day</span>
+            <output id="timeLabel" for="timeSlider">16:00</output>
+          </label>
+          <input id="timeSlider" type="range" min="0" max="24" step="0.1" value="16" aria-label="Time of day" />
+        </div>
+
+        <div class="field">
+          <span class="field-label">Weather</span>
+          <div class="seg" role="group" aria-label="Weather">
+            <button id="weatherClear" type="button" class="seg-btn" aria-pressed="true">☀️ Clear</button>
+            <button id="weatherRain" type="button" class="seg-btn" aria-pressed="false">🌧️ Rain</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="windSlider" class="field-label">
+            <span>Wind</span>
+            <output id="windLabel" for="windSlider">30%</output>
+          </label>
+          <input id="windSlider" type="range" min="0" max="100" step="1" value="30" aria-label="Wind strength" />
+        </div>
+
+        <div class="field-row">
+          <button id="lightsBtn" type="button" class="btn" aria-pressed="false">💡 Lights: Off</button>
+          <button id="resetBtn" type="button" class="btn btn-primary">↺ Reset</button>
+        </div>
+
+        <p class="hint">
+          Drag to orbit · scroll/pinch to zoom · click the house to toggle its lights
+        </p>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

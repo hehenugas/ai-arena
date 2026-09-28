@@ -1,0 +1,163 @@
+[
+  {
+    "id": "gemini-3.7-flash",
+    "name": "Gemini 3.7 Flash",
+    "port": 5101,
+    "fallbackPort": 4173,
+    "path": "/gemini-3.7-flash/",
+    "tag": "Google",
+    "color": "#4285F4"
+  },
+  {
+    "id": "gemini-3.8-flash",
+    "name": "Gemini 3.8 Flash",
+    "port": 5102,
+    "fallbackPort": 5174,
+    "path": "/gemini-3.8-flash/",
+    "tag": "Google",
+    "color": "#34A853"
+  },
+  {
+    "id": "deepseek-v4.1-flash-coreweave",
+    "name": "DeepSeek v4.1 Flash (CoreWeave)",
+    "port": 5103,
+    "fallbackPort": 5175,
+    "path": "/deepseek-v4.1-flash-coreweave/",
+    "tag": "DeepSeek",
+    "color": "#4E6EF2"
+  },
+  {
+    "id": "deepseek-v4.1-flash-freebuff",
+    "name": "DeepSeek v4.1 Flash (Freebuff)",
+    "port": 5104,
+    "fallbackPort": null,
+    "path": "/deepseek-v4.1-flash-freebuff/",
+    "tag": "DeepSeek",
+    "color": "#00A4E4"
+  },
+  {
+    "id": "deepseek-v4-flash-0731-coreweave",
+    "name": "DeepSeek v4 Flash 0731 (CoreWeave)",
+    "port": 5105,
+    "fallbackPort": null,
+    "path": "/deepseek-v4-flash-0731-coreweave/",
+    "tag": "DeepSeek",
+    "color": "#7B68EE"
+  },
+  {
+    "id": "glm-5.2-coreweave",
+    "name": "GLM 5.2 (CoreWeave)",
+    "port": 5106,
+    "fallbackPort": 4174,
+    "path": "/glm-5.2-coreweave/",
+    "tag": "Zhipu AI",
+    "color": "#20B2AA"
+  },
+  {
+    "id": "glm-5.3-flash-coreweave",
+    "name": "GLM 5.3 Flash (CoreWeave)",
+    "port": 5107,
+    "fallbackPort": 5210,
+    "path": "/glm-5.3-flash-coreweave/",
+    "tag": "Zhipu AI",
+    "color": "#008080"
+  },
+  {
+    "id": "glm-5.3-flash-freebuff",
+    "name": "GLM 5.3 Flash (Freebuff)",
+    "port": 5108,
+    "fallbackPort": 5199,
+    "path": "/glm-5.3-flash-freebuff/",
+    "tag": "Zhipu AI",
+    "color": "#2E8B57"
+  },
+  {
+    "id": "mimo-v2.6-flash",
+    "name": "MIMO v2.6 Flash",
+    "port": 5109,
+    "fallbackPort": null,
+    "path": "/mimo-v2.6-flash/",
+    "tag": "Xiaomi / MIMO",
+    "color": "#FF6700"
+  },
+  {
+    "id": "muse-spark-1.3-opencode",
+    "name": "Muse Spark 1.3 (Opencode)",
+    "port": 5110,
+    "fallbackPort": 5173,
+    "path": "/muse-spark-1.3-opencode/",
+    "tag": "Muse / Spark",
+    "color": "#E91E63"
+  },
+  {
+    "id": "claude-sonnet-4.6-antigravity",
+    "name": "Claude Sonnet 4.6 (Antigravity)",
+    "port": 5111,
+    "fallbackPort": null,
+    "path": "/claude-sonnet-4.6-antigravity/",
+    "tag": "Anthropic",
+    "color": "#D97706"
+  },
+  {
+    "id": "claude-opus-4.6-antigravity",
+    "name": "Claude Opus 4.6 (Antigravity)",
+    "port": 5112,
+    "fallbackPort": null,
+    "path": "/claude-opus-4.6-antigravity/",
+    "tag": "Anthropic",
+    "color": "#8B5CF6"
+  },
+  {
+    "id": "gpt-6-luna-codex",
+    "name": "GPT 6 Luna (Codex)",
+    "port": 5113,
+    "fallbackPort": null,
+    "path": "/gpt-6-luna-codex/",
+    "tag": "OpenAI",
+    "color": "#10A37F"
+  },
+  {
+    "id": "gpt-5.6-luna-codex",
+    "name": "GPT 5.6 Luna (Codex)",
+    "port": 5114,
+    "fallbackPort": null,
+    "path": "/gpt-5.6-luna-codex/",
+    "tag": "OpenAI",
+    "color": "#10A37F"
+  },
+  {
+    "id": "opus-5.5-cursor",
+    "name": "Opus 5.5 (Cursor)",
+    "port": 5115,
+    "fallbackPort": null,
+    "path": "/opus-5.5-cursor/",
+    "tag": "Anthropic",
+    "color": "#C084FC"
+  },
+  {
+    "id": "grok-4.7-cursor",
+    "name": "Grok 4.7 (Cursor)",
+    "port": 5116,
+    "fallbackPort": null,
+    "path": "/grok-4.7-cursor/",
+    "tag": "xAI",
+    "color": "#E8E8E8"
+  },
+  {
+    "id": "space-bunny-cline",
+    "name": "Space Bunny (Cline)",
+    "port": 5117,
+    "fallbackPort": null,
+    "path": "/space-bunny-cline/",
+    "tag": "Pocket World",
+    "color": "#7CC4A4"
+  },
+  {
+    "id": "longcat-2.5-opencode",
+    "name": "LongCat 2.5 (Opencode)",
+    "port": 5118,
+    "fallbackPort": null,
+    "path": "/longcat-2.5-opencode/",
+    "tag": "LongCat"
+  }
+]

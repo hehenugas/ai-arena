@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Pocket World — a tiny interactive floating island." />
+    <meta name="theme-color" content="#d7e6f2" />
+    <title>Pocket World</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='20' r='8' fill='%237da85a'/%3E%3Cpath d='M8 20c2-6 14-6 16 0' fill='%236b5344'/%3E%3Ccircle cx='20' cy='14' r='3' fill='%23f4ecdf'/%3E%3Cpath d='M17 12l3-4 3 4' fill='%23c46a4a'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <canvas
+        id="scene"
+        aria-label="Pocket World, a three-dimensional diorama of a floating island. Drag to orbit, scroll or pinch to zoom, and click the house to toggle its lights."
+      ></canvas>
+      <div id="overlay"></div>
+      <div id="fallback" class="fallback" hidden></div>
+    </div>
+    <noscript>
+      <p class="fallback">Pocket World needs JavaScript to show the island.</p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

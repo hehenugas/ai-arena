@@ -1,0 +1,21 @@
+{
+  "name": "pocket-world-gpt-6-luna",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A small interactive Three.js floating-island diorama.",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.3.5"
+  }
+}

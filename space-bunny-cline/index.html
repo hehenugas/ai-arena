@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="Pocket World - a tiny floating island you can orbit, relight, and rain on."
+    />
+    <title>Pocket World</title>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Interactive 3D diorama of a floating island"></canvas>
+
+    <div id="fallback" class="fallback" hidden>
+      <h1>Pocket World</h1>
+      <p id="fallback-reason">
+        This diorama needs WebGL, and this browser could not start it.
+      </p>
+      <p class="fallback__hint">
+        Try a recent version of Chrome, Edge, Firefox or Safari, and make sure hardware
+        acceleration is enabled.
+      </p>
+    </div>
+
+    <div class="loading" id="loading" role="status">Growing the island&hellip;</div>
+
+    <main class="panel" id="panel" aria-label="Pocket World controls">
+      <button
+        class="panel__collapse"
+        id="panel-toggle"
+        type="button"
+        aria-expanded="true"
+        aria-controls="panel-body"
+      >
+        <span class="panel__collapse-label">Controls</span>
+        <span class="panel__chevron" aria-hidden="true"></span>
+      </button>
+
+      <div class="panel__body" id="panel-body">
+        <header class="panel__head">
+          <h1 class="panel__title">Pocket World</h1>
+          <p class="panel__sub">A pocket diorama, kept in a jar of weather.</p>
+        </header>
+
+        <div class="field">
+          <div class="field__row">
+            <label class="field__label" for="time">Time of day</label>
+            <output class="field__value" id="time-value" for="time">16:00</output>
+          </div>
+          <input
+            class="slider"
+            type="range"
+            id="time"
+            min="0"
+            max="24"
+            step="0.05"
+            value="16"
+            aria-describedby="time-hint"
+          />
+          <p class="field__hint" id="time-hint">Drag to move the sun from midnight to noon.</p>
+        </div>
+
+        <fieldset class="field">
+          <legend class="field__label">Weather</legend>
+          <div class="segmented" role="group" aria-label="Weather">
+            <button class="segmented__btn is-active" type="button" data-weather="clear" aria-pressed="true">
+              Clear
+            </button>
+            <button class="segmented__btn" type="button" data-weather="rain" aria-pressed="false">
+              Rain
+            </button>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <div class="field__row">
+            <label class="field__label" for="wind">Wind</label>
+            <output class="field__value" id="wind-value" for="wind">30%</output>
+          </div>
+          <input class="slider" type="range" id="wind" min="0" max="100" step="1" value="30" />
+        </div>
+
+        <div class="field field--switch">
+          <span class="field__label" id="lights-label">House lights</span>
+          <button
+            class="switch"
+            id="lights"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-labelledby="lights-label"
+          >
+            <span class="switch__track"><span class="switch__thumb"></span></span>
+            <span class="switch__text" id="lights-text">Off</span>
+          </button>
+        </div>
+
+        <button class="reset" id="reset" type="button">Reset world</button>
+
+        <p class="hint">
+          <span><b>Drag</b> to orbit</span>
+          <span><b>Scroll</b> or pinch to zoom</span>
+          <span><b>Tap the house</b> to toggle its lights</span>
+        </p>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

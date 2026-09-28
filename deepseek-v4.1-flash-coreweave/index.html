@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Pocket World — an interactive 3D diorama of a tiny floating island with a day/night cycle, weather and wind."
+    />
+    <meta name="color-scheme" content="dark" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='12' r='10' fill='%237cc45e'/%3E%3Cpath d='M6 12L16 30L26 12Z' fill='%237b7264'/%3E%3C/svg%3E"
+    />
+    <title>Pocket World</title>
+  </head>
+  <body>
+    <div id="scene" aria-hidden="true"></div>
+
+    <aside id="panel" class="panel" aria-label="Pocket World controls">
+      <header class="panel__head">
+        <h1 class="panel__title">
+          <span class="panel__dot" aria-hidden="true"></span>
+          Pocket World
+        </h1>
+        <button
+          id="panel-toggle"
+          class="panel__collapse"
+          type="button"
+          aria-expanded="true"
+          aria-controls="panel-body"
+          aria-label="Collapse controls"
+        >
+          ▾
+        </button>
+      </header>
+
+      <div id="panel-body" class="panel__body">
+        <div class="field">
+          <div class="field__row">
+            <label for="time">Time of day</label>
+            <output id="time-value" for="time">16:00</output>
+          </div>
+          <input id="time" type="range" min="0" max="1440" step="5" value="960" />
+        </div>
+
+        <div class="field">
+          <div class="field__row">
+            <span class="field__label">Weather</span>
+          </div>
+          <div class="segmented" role="group" aria-label="Weather">
+            <button id="weather-clear" type="button" data-weather="clear" aria-pressed="true">
+              Clear
+            </button>
+            <button id="weather-rain" type="button" data-weather="rain" aria-pressed="false">
+              Rain
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field__row">
+            <label for="wind">Wind</label>
+            <output id="wind-value" for="wind">30%</output>
+          </div>
+          <input id="wind" type="range" min="0" max="100" step="1" value="30" />
+        </div>
+
+        <button id="lights-toggle" class="toggle" type="button" aria-pressed="false">
+          House lights: Off
+        </button>
+
+        <button id="reset" class="reset" type="button">Reset view &amp; world</button>
+
+        <p class="hint">
+          Drag to orbit · Scroll or pinch to zoom · Click the house to toggle its lights.
+        </p>
+      </div>
+    </aside>
+
+    <div id="fallback" class="fallback" hidden>
+      <div class="fallback__card">
+        <h2 data-title>Something went wrong</h2>
+        <p data-message>Pocket World could not start.</p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

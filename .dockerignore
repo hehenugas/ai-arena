@@ -1,0 +1,25 @@
+# The Dockerfile copies the whole repo once and then builds every model listed in
+# aggregator/models.json, so this file decides how big the build context is.
+# Everything listed here is either regenerated inside the image or has no
+# business being in a container.
+
+.git
+.gitignore
+.gitattributes
+
+# Installed and rebuilt inside the image
+**/node_modules
+**/dist
+**/dist-ssr
+**/.vite
+
+# Screenshots, logs, local state
+**/.shots
+**/*.log
+**/*.local
+**/.DS_Store
+.freebuff
+
+# Docs and orchestration files: not needed by the build stage
+docker-compose.yml
+**/README.md

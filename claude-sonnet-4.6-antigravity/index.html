@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pocket World</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #1a1a2e; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
+      #app { width: 100vw; height: 100vh; }
+      #no-webgl {
+        display: none;
+        position: fixed; inset: 0;
+        background: #1a1a2e;
+        color: #f0ede6;
+        font-size: 1.1rem;
+        text-align: center;
+        padding: 2rem;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      #no-webgl.visible { display: flex; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="no-webgl">
+      <h2>WebGL Not Available</h2>
+      <p>Pocket World requires WebGL to run. Please try a modern browser with hardware acceleration enabled.</p>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

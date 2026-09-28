@@ -1,0 +1,66 @@
+# ==============================================================================
+# Caddyfile - Multi-Model AI Router & Aggregator Hub
+# ==============================================================================
+
+(route_model) {
+	redir /{args[0]} /{args[0]}/
+
+	# dist/ berisi asset relatif (./assets/...), jadi prefix di-strip
+	# sebelum diteruskan ke static server di port model.
+	handle_path /{args[0]}/* {
+		reverse_proxy 127.0.0.1:{args[1]} {
+			header_up Host localhost
+		}
+	}
+}
+
+:8080 {
+	# --------------------------------------------------------------------------
+	# Model Reverse Proxy Routes
+	# --------------------------------------------------------------------------
+	import route_model gemini-3.7-flash 5101
+	import route_model gemini-3.8-flash 5102
+	import route_model deepseek-v4.1-flash-coreweave 5103
+	import route_model deepseek-v4.1-flash-freebuff 5104
+	import route_model deepseek-v4-flash-0731-coreweave 5105
+	import route_model glm-5.2-coreweave 5106
+	import route_model glm-5.3-flash-coreweave 5107
+	import route_model glm-5.3-flash-freebuff 5108
+	import route_model mimo-v2.6-flash 5109
+	import route_model muse-spark-1.3-opencode 5110
+	import route_model claude-sonnet-4.6-antigravity 5111
+	import route_model claude-opus-4.6-antigravity 5112
+	import route_model gpt-6-luna-codex 5113
+	import route_model gpt-5.6-luna-codex 5114
+	import route_model opus-5.5-cursor 5115
+	import route_model grok-4.7-cursor 5116
+	import route_model space-bunny-cline 5117
+	import route_model longcat-2.5-opencode 5118
+
+	# --------------------------------------------------------------------------
+	# Aggregator Dashboard & Static Assets
+	# --------------------------------------------------------------------------
+	handle /models.json {
+		root * /home/aorus/Project/testing/aggregator
+		file_server
+	}
+
+	handle /aggregator/* {
+		root * /home/aorus/Project/testing
+		file_server
+	}
+
+	# Default root serves Aggregator UI
+	handle {
+		root * /home/aorus/Project/testing/aggregator
+		try_files {path} /index.html
+		file_server
+	}
+
+	# --------------------------------------------------------------------------
+	# Error Handling
+	# --------------------------------------------------------------------------
+	handle_errors {
+		respond "<h3>502 - Model Server Belum Aktif</h3><p>Server untuk model ini belum dijalankan atau port belum siap. Silakan cek status di <a href='/'>Dashboard Utama</a>.</p><p><a href='/'>Kembali ke Dashboard Utama</a></p>" 502
+	}
+}

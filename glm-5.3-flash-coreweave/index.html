@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d2b3a" />
+    <title>Pocket World — a tiny floating island</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene" aria-label="3D floating island diorama"></canvas>
+
+      <div id="loading" role="status" aria-live="polite">
+        <div class="load-card">
+          <div class="load-spin" aria-hidden="true"></div>
+          <p>Assembling your pocket world…</p>
+        </div>
+      </div>
+
+      <div id="webgl-error" hidden>
+        <div class="load-card">
+          <h1>Pocket World</h1>
+          <p>
+            This experience needs WebGL, but your browser could not start it.<br />
+            Try a recent version of Chrome, Firefox, Edge or Safari with hardware
+            acceleration enabled.
+          </p>
+        </div>
+      </div>
+
+      <aside id="panel" aria-label="Pocket World controls">
+        <header>
+          <h1>Pocket World</h1>
+          <button id="panel-collapse" aria-expanded="true" title="Collapse panel">
+            <span aria-hidden="true">▾</span>
+          </button>
+        </header>
+
+        <div id="panel-body">
+          <section class="control">
+            <div class="row">
+              <label for="time-slider">Time of day</label>
+              <output id="time-label" for="time-slider">16:00</output>
+            </div>
+            <input
+              id="time-slider"
+              type="range"
+              min="0"
+              max="1440"
+              step="1"
+              value="960"
+              aria-describedby="time-hint"
+            />
+            <div class="scale" id="time-hint" aria-hidden="true">
+              <span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>24h</span>
+            </div>
+            <div class="chips" role="group" aria-label="Quick times">
+              <button class="chip" data-time="480">Morning</button>
+              <button class="chip" data-time="720">Noon</button>
+              <button class="chip" data-time="1110">Golden</button>
+              <button class="chip" data-time="1380">Night</button>
+            </div>
+          </section>
+
+          <section class="control">
+            <span class="control-title">Weather</span>
+            <div class="chips" role="group" aria-label="Weather">
+              <button class="chip chip-toggle is-active" data-weather="clear" aria-pressed="true">
+                ☀ Clear
+              </button>
+              <button class="chip chip-toggle" data-weather="rain" aria-pressed="false">
+                ☂ Rain
+              </button>
+            </div>
+          </section>
+
+          <section class="control">
+            <div class="row">
+              <label for="wind-slider">Wind</label>
+              <output id="wind-label" for="wind-slider">30%</output>
+            </div>
+            <input id="wind-slider" type="range" min="0" max="100" step="1" value="30" />
+            <div class="scale" aria-hidden="true"><span>Calm</span><span>Breezy</span><span>Gusty</span></div>
+          </section>
+
+          <section class="control">
+            <button id="lights-toggle" class="button" aria-pressed="false">
+              <span class="bulb" aria-hidden="true">💡</span> House lights
+            </button>
+          </section>
+
+          <footer>
+            <button id="reset" class="button subtle">↺ Reset world</button>
+            <p class="hint">Drag to orbit · scroll / pinch to zoom · tap the house to toggle its lights</p>
+          </footer>
+        </div>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

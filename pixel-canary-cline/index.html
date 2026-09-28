@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Pocket World</title>
+    <meta
+      name="description"
+      content="Pocket World - an interactive 3D diorama of a tiny floating island."
+    />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="scene"></canvas>
+    </div>
+
+    <aside id="panel" class="panel" aria-label="Pocket World controls">
+      <div class="panel__bar">
+        <div class="brand">
+          <h1 class="brand__title">Pocket World</h1>
+          <p class="brand__sub">A floating island you can wind, wet and light up.</p>
+        </div>
+        <button
+          id="panel-toggle"
+          class="panel-toggle"
+          type="button"
+          aria-expanded="true"
+          aria-controls="panel-body"
+        >
+          <span class="panel-toggle__label">Hide</span>
+          <svg class="panel-toggle__icon" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="panel-body" class="panel__body">
+        <div class="control">
+          <div class="control__head">
+            <label for="time">Time of day</label>
+            <output id="time-out" for="time">16:00</output>
+          </div>
+          <input id="time" type="range" min="0" max="1439" step="1" value="960" />
+          <div class="control__scale" aria-hidden="true">
+            <span>00</span><span>06</span><span>12</span><span>18</span><span>24</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <div class="control__head"><span class="control__legend">Weather</span></div>
+          <div class="segmented" role="group" aria-label="Weather">
+            <button type="button" class="seg is-on" data-weather="clear" aria-pressed="true">
+              Clear
+            </button>
+            <button type="button" class="seg" data-weather="rain" aria-pressed="false">
+              Rain
+            </button>
+          </div>
+        </div>
+
+        <div class="control">
+          <div class="control__head">
+            <label for="wind">Wind</label>
+            <output id="wind-out" for="wind">30%</output>
+          </div>
+          <input id="wind" type="range" min="0" max="100" step="1" value="30" />
+        </div>
+
+        <div class="control control--row">
+          <div>
+            <span class="control__legend" id="lights-label">House lights</span>
+            <span class="control__state" id="lights-state">Off</span>
+          </div>
+          <button
+            id="lights"
+            class="switch"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-labelledby="lights-label"
+          >
+            <span class="switch__track"><span class="switch__knob"></span></span>
+          </button>
+        </div>
+
+        <button id="reset" class="btn" type="button">Reset scene</button>
+
+        <p class="hint">
+          Drag to orbit, scroll or pinch to zoom. Tapping the house switches its lights.
+        </p>
+      </div>
+    </aside>
+
+    <div id="fallback" class="fallback" hidden>
+      <div class="fallback__card">
+        <h2>Pocket World could not start</h2>
+        <p id="fallback-msg">
+          This diorama needs a browser with WebGL enabled. Try another browser, or turn
+          hardware acceleration back on.
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
