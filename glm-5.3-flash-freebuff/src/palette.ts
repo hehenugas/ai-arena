@@ -31,25 +31,25 @@ interface Key {
 
 const KEYS: Key[] = [
   //  deep night
-  { t: 0,    zenith: 0x0a1226, horizon: 0x1b2a45, sunColor: 0x3a4d78, sun: 0.0,  ambient: 0x2c3a58, ambientI: 0.30, hemi: 0x39466a, hemiI: 0.30, fog: 0x111a2e, dusk: 1.0 },
+  { t: 0,    zenith: 0x0e1730, horizon: 0x223454, sunColor: 0x3a4d78, sun: 0.0,  ambient: 0x556392, ambientI: 0.92, hemi: 0x5e6ea0, hemiI: 0.78, fog: 0x16203a, dusk: 1.0 },
   //  pre-dawn
-  { t: 300,  zenith: 0x17233f, horizon: 0x4a3a55, sunColor: 0x7a5a78, sun: 0.0,  ambient: 0x39405f, ambientI: 0.34, hemi: 0x47507a, hemiI: 0.35, fog: 0x232c48, dusk: 0.9 },
+  { t: 300,  zenith: 0x1b2a4a, horizon: 0x524262, sunColor: 0x7a5a78, sun: 0.0,  ambient: 0x556398, ambientI: 0.85, hemi: 0x5e6ea4, hemiI: 0.74, fog: 0x2a3556, dusk: 0.9 },
   //  sunrise
   { t: 375,  zenith: 0x4a6a9e, horizon: 0xf2a45c, sunColor: 0xffb36b, sun: 1.5,  ambient: 0x6a6480, ambientI: 0.42, hemi: 0x8a7d90, hemiI: 0.45, fog: 0x8f7f92, dusk: 0.75 },
   //  morning
-  { t: 510,  zenith: 0x79aade, horizon: 0xd9e9f2, sunColor: 0xffe7bd, sun: 2.6,  ambient: 0x8a95a8, ambientI: 0.50, hemi: 0xbcd2e8, hemiI: 0.60, fog: 0xbcd2e0, dusk: 0.15 },
+  { t: 510,  zenith: 0x5e9ed9, horizon: 0xcfe4f2, sunColor: 0xffe7bd, sun: 2.6,  ambient: 0x8a95a8, ambientI: 0.50, hemi: 0xbcd2e8, hemiI: 0.60, fog: 0xbcd2e0, dusk: 0.15 },
   //  midday
-  { t: 780,  zenith: 0x7db4e8, horizon: 0xdcebf5, sunColor: 0xfff2d8, sun: 3.0,  ambient: 0x94a0b4, ambientI: 0.55, hemi: 0xc4d9ec, hemiI: 0.65, fog: 0xc2d5e6, dusk: 0.0 },
+  { t: 780,  zenith: 0x4f92dd, horizon: 0xc4dcf0, sunColor: 0xfff2d8, sun: 3.0,  ambient: 0x94a0b4, ambientI: 0.55, hemi: 0xc4d9ec, hemiI: 0.65, fog: 0xc2d5e6, dusk: 0.0 },
   //  afternoon (default 16:00)
-  { t: 960,  zenith: 0x74a9e0, horizon: 0xe8ddc8, sunColor: 0xffe2b0, sun: 2.8,  ambient: 0x8d97ac, ambientI: 0.52, hemi: 0xc0d4e8, hemiI: 0.62, fog: 0xbccfe0, dusk: 0.05 },
+  { t: 960,  zenith: 0x4a8dd8, horizon: 0xbfd9ec, sunColor: 0xffe2b0, sun: 2.8,  ambient: 0x8d97ac, ambientI: 0.52, hemi: 0xc0d4e8, hemiI: 0.62, fog: 0xbccfe0, dusk: 0.05 },
   //  golden hour
   { t: 1170, zenith: 0x5a7ab8, horizon: 0xf7b26a, sunColor: 0xffa04e, sun: 2.1,  ambient: 0x7d7488, ambientI: 0.45, hemi: 0xa08ba0, hemiI: 0.5,  fog: 0xc4a184, dusk: 0.55 },
   //  sunset
   { t: 1245, zenith: 0x31416e, horizon: 0xe87a52, sunColor: 0xff7a3c, sun: 1.2,  ambient: 0x5c5470, ambientI: 0.40, hemi: 0x746a8c, hemiI: 0.42, fog: 0x8a6a70, dusk: 0.85 },
   //  dusk → night
-  { t: 1335, zenith: 0x141f3a, horizon: 0x413354, sunColor: 0x55406a, sun: 0.1,  ambient: 0x363f5c, ambientI: 0.34, hemi: 0x46507a, hemiI: 0.36, fog: 0x1c2740, dusk: 1.0 },
+  { t: 1335, zenith: 0x182440, horizon: 0x4a3c5e, sunColor: 0x55406a, sun: 0.1,  ambient: 0x525e90, ambientI: 0.85, hemi: 0x5a6698, hemiI: 0.72, fog: 0x232e4c, dusk: 1.0 },
   //  midnight
-  { t: 1440, zenith: 0x0a1226, horizon: 0x1b2a45, sunColor: 0x3a4d78, sun: 0.0,  ambient: 0x2c3a58, ambientI: 0.30, hemi: 0x39466a, hemiI: 0.30, fog: 0x111a2e, dusk: 1.0 },
+  { t: 1440, zenith: 0x0e1730, horizon: 0x223454, sunColor: 0x3a4d78, sun: 0.0,  ambient: 0x556392, ambientI: 0.92, hemi: 0x5e6ea0, hemiI: 0.78, fog: 0x16203a, dusk: 1.0 },
 ];
 
 //  Lazily resolve THREE.Color through a registry set by main, so this module
@@ -122,25 +122,25 @@ export function mixHex(h1: number, h2: number, t: number): number {
 
 /** Landscape material tints: [day, night] — night value is used with duskiness. */
 export const TINTS = {
-  grassTop: [0x7dca6f, 0x27415c] as const,
-  grassSide: [0x64b25e, 0x1f3a55] as const,
-  dirt: [0x8a6a4f, 0x3a3a55] as const,
-  rock: [0x8d9099, 0x39415a] as const,
-  rockDark: [0x6d7078, 0x2e3550] as const,
-  trunk: [0x8a5a3b, 0x3d3348] as const,
-  foliage: [0x5fae58, 0x23405c] as const,
-  foliageDark: [0x4c9a4c, 0x1e3a56] as const,
-  water: [0x5aa7d9, 0x27406b] as const,
-  path: [0xd9c39a, 0x4a4560] as const,
-  wall: [0xf3e6cf, 0x54506b] as const,
-  wood: [0xa8713f, 0x403550] as const,
-  woodDark: [0x7c4f2c, 0x352c48] as const,
-  roof: [0xc75b45, 0x3d2f52] as const,
-  roofCap: [0xb04e3b, 0x372a4a] as const,
-  leaf: [0xe8845c, 0x5c4a68] as const,
-  leafCore: [0xd06a48, 0x513f5e] as const,
-  fence: [0xb98c5c, 0x3f3a55] as const,
-  flower: [0xffffff, 0x8888aa] as const,
+  grassTop: [0x7dca6f, 0x4e6a86] as const,
+  grassSide: [0x64b25e, 0x46617e] as const,
+  dirt: [0x8a6a4f, 0x5c5a76] as const,
+  rock: [0x8d9099, 0x5a6480] as const,
+  rockDark: [0x6d7078, 0x4a5470] as const,
+  trunk: [0x8a5a3b, 0x5e5570] as const,
+  foliage: [0x5fae58, 0x466284] as const,
+  foliageDark: [0x4c9a4c, 0x3f5a7c] as const,
+  water: [0x5aa7d9, 0x46648e] as const,
+  path: [0xd9c39a, 0x6e6884] as const,
+  wall: [0xf3e6cf, 0x7a7690] as const,
+  wood: [0xa8713f, 0x665a7c] as const,
+  woodDark: [0x7c4f2c, 0x5a5070] as const,
+  roof: [0xc75b45, 0x645578] as const,
+  roofCap: [0xb04e3b, 0x5c5070] as const,
+  leaf: [0xe8845c, 0x7c6a88] as const,
+  leafCore: [0xd06a48, 0x715f7e] as const,
+  fence: [0xb98c5c, 0x656080] as const,
+  flower: [0xffffff, 0x9a9abc] as const,
   cloud: [0xffffff, 0x6a7690] as const,
   cloudShade: [0xdce8f2, 0x525e78] as const,
 } as const;

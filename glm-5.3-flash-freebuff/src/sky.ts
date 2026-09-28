@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { TINTS } from './palette';
 import { makeNoise2D, makeRng, disposeObject } from './geometry';
 
 export interface SkyDome {
@@ -33,6 +32,7 @@ export function buildSky(
     depthWrite: false,
     fog: false,
   });
+  domeMat.toneMapped = false; // keep sky colors vivid
   const dome = new THREE.Mesh(domeGeo, domeMat);
   dome.renderOrder = -10;
   group.add(dome);
@@ -40,6 +40,7 @@ export function buildSky(
   // ---- sun & moon ----
   const discGeo = new THREE.CircleGeometry(13, 40);
   const sunMat = new THREE.MeshBasicMaterial({ transparent: true, fog: false, depthWrite: false });
+  sunMat.toneMapped = false;
   const sun = new THREE.Mesh(discGeo, sunMat);
   sun.renderOrder = -9;
   group.add(sun);
@@ -58,6 +59,7 @@ export function buildSky(
   group.add(sunGlow);
 
   const moonMat = new THREE.MeshBasicMaterial({ transparent: true, fog: false, depthWrite: false });
+  moonMat.toneMapped = false;
   const moon = new THREE.Mesh(discGeo, moonMat);
   moon.renderOrder = -9;
   group.add(moon);
@@ -116,24 +118,24 @@ export function buildSky(
   const cloudGroup = new THREE.Group();
   group.add(cloudGroup);
 
-  const cloudMat = new THREE.MeshLambertMaterial({ color: TINTS.cloud[0], transparent: true, opacity: 0.95, fog: false });
-  const cloudShadeMat = new THREE.MeshLambertMaterial({ color: TINTS.cloudShade[0], transparent: true, opacity: 0.9, fog: false });
+  const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.92, fog: false });
+  const cloudShadeMat = new THREE.MeshBasicMaterial({ color: 0xdde7f2, transparent: true, opacity: 0.9, fog: false });
 
   const puffGeo = new THREE.SphereGeometry(1, 14, 10);
   const noise = makeNoise2D(99);
 
   const mkCloud = (x: number, y: number, z: number, scale: number, seedIdx: number): Cloud => {
     const g = new THREE.Group();
-    const puffs = 5 + Math.floor(noise(seedIdx, 3) * 4);
+    const puffs = 7 + Math.floor(noise(seedIdx, 3) * 4);
     for (let i = 0; i < puffs; i++) {
-      const px = (noise(seedIdx + i * 0.7, 11) - 0.5) * 2.6;
-      const py = (noise(seedIdx + i * 0.7, 23) - 0.5) * 0.7;
-      const pz = (noise(seedIdx + i * 0.7, 37) - 0.5) * 1.3;
-      const s = (0.55 + noise(seedIdx + i * 0.7, 51) * 0.75) * scale;
+      const px = (noise(seedIdx + i * 0.7, 11) - 0.5) * 3.4;
+      const py = (noise(seedIdx + i * 0.7, 23) - 0.5) * 0.5;
+      const pz = (noise(seedIdx + i * 0.7, 37) - 0.5) * 1.6;
+      const s = (0.45 + noise(seedIdx + i * 0.7, 51) * 0.6) * scale;
       const mat = i % 3 === 2 ? cloudShadeMat : cloudMat;
       const m = new THREE.Mesh(puffGeo, mat);
       m.position.set(px, py, pz);
-      m.scale.set(s * 1.25, s * 0.75, s);
+      m.scale.set(s * 1.3, s * 0.55, s);
       m.rotation.y = noise(seedIdx + i, 61) * Math.PI;
       g.add(m);
     }
@@ -151,19 +153,18 @@ export function buildSky(
     return cloud;
   };
 
-  // All clouds stay well away from the camera corridor: the low ones float
-  // BELOW the island (floating-island look), the high ones are far out so they
-  // render small. Nothing drifts through the default view.
-  mkCloud(-44, -12, 26, 7.5, 1);
-  mkCloud(50, -16, -20, 8.5, 2);
-  mkCloud(-14, -24, -50, 6.5, 3);
-  mkCloud(30, -14, 44, 5.5, 4);
-  mkCloud(-62, -18, -14, 7, 5);
-  mkCloud(8, -30, -66, 5, 6);
-  mkCloud(0, 48, -95, 7, 7);
-  mkCloud(-88, 44, -60, 6, 8);
-  mkCloud(92, 52, -48, 6.5, 9);
-  mkCloud(-95, 40, 40, 7, 10);
+  // Distant mid-height clouds (read as small, never block the island),
+  // plus a low ring below the island for the floating look.
+  mkCloud(-95, 12, -80, 4.5, 1);
+  mkCloud(88, 16, -100, 5, 2);
+  mkCloud(-115, 6, -40, 4, 3);
+  mkCloud(105, 4, 70, 4, 4);
+  mkCloud(-48, -22, 30, 5, 5);
+  mkCloud(14, -28, -60, 4.5, 6);
+  mkCloud(0, 52, -100, 6, 7);
+  mkCloud(-92, 46, -64, 5.5, 8);
+  mkCloud(96, 54, -52, 5.5, 9);
+  mkCloud(-100, 42, 44, 6, 10);
 
   const api: SkyDome = {
     group,
@@ -176,11 +177,10 @@ export function buildSky(
     },
 
     setStorm(s: number) {
-      const dark = new THREE.Color(TINTS.cloud[0]).lerp(new THREE.Color(0x5d687e), s * 0.75);
+      const dark = new THREE.Color(0xffffff).lerp(new THREE.Color(0x5d687e), s * 0.75);
       cloudMat.color.copy(dark);
-      const dark2 = new THREE.Color(TINTS.cloudShade[0]).lerp(new THREE.Color(0x4a5568), s * 0.75);
+      const dark2 = new THREE.Color(0xdde7f2).lerp(new THREE.Color(0x4a5568), s * 0.75);
       cloudShadeMat.color.copy(dark2);
-      cloudMat.opacity = 0.95;
     },
 
     setStarOpacity(o: number) {
@@ -232,7 +232,7 @@ export function buildSky(
     // ---- cloud animation driven by shared wind ----
     updateClouds(wind: number, dt: number, elapsed: number, reducedMotion: boolean) {
       for (const c of clouds) {
-        const speed = c.speed * (0.25 + wind * 2.6);
+        const speed = c.speed * (0.04 + wind * 2.8); // ~still at zero wind
         if (!reducedMotion) {
           c.group.position.x += speed * dt;
           // wrap around a large ring
@@ -267,13 +267,14 @@ function skyTextureFor(
   const cached = texCache.get(key);
   if (cached) return cached;
 
-  const size = 256;
+  const size = 512;
   const c = document.createElement('canvas');
-  c.width = 4;
+  c.width = 32;
   c.height = size;
   const ctx = c.getContext('2d')!;
 
-  const below = fc.clone().lerp(new THREE.Color(0x1c2436), 0.45);
+  // slight vertical blur between stops to kill gradient banding
+  const below = fc.clone().lerp(new THREE.Color(0x5a6478), 0.35);
   const grad = ctx.createLinearGradient(0, 0, 0, size);
   const horizonY = 0.46;
   grad.addColorStop(0, `#${zc.getHexString()}`);
@@ -282,15 +283,18 @@ function skyTextureFor(
   grad.addColorStop(Math.min(1, horizonY + 0.18), `#${hc.clone().lerp(below, 0.6).getHexString()}`);
   grad.addColorStop(1, `#${below.getHexString()}`);
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 4, size);
+  ctx.fillRect(0, 0, 32, size);
 
-  // subtle horizon dithering against banding
-  ctx.globalAlpha = 0.045;
-  for (let y = Math.floor(horizonY * size) - 30; y < Math.min(size, horizonY * size + 30); y += 2) {
-    ctx.fillStyle = y % 4 === 0 ? '#ffffff' : '#000000';
-    ctx.fillRect(0, y, 4, 1);
+  // fine 2D noise against 8-bit gradient banding (avoids row-moiré)
+  const img = ctx.getImageData(0, 0, 32, size);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() - 0.5) * 7;
+    d[i] = Math.max(0, Math.min(255, d[i] + n));
+    d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n));
+    d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n));
   }
-  ctx.globalAlpha = 1;
+  ctx.putImageData(img, 0, 0);
 
   if (dusk > 0.4) {
     // faint evening tint above horizon
@@ -303,8 +307,9 @@ function skyTextureFor(
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.magFilter = THREE.LinearFilter;
-  tex.minFilter = THREE.LinearFilter;
-  tex.generateMipmaps = false;
+  tex.minFilter = THREE.LinearMipmapLinearFilter; // smooth at glancing angles
+  tex.anisotropy = 8;
+  tex.generateMipmaps = true;
   tex.wrapS = THREE.ClampToEdgeWrapping;
   tex.wrapT = THREE.ClampToEdgeWrapping;
 

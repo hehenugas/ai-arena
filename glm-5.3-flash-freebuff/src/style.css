@@ -362,13 +362,14 @@ input[type='range']::-moz-range-thumb {
     left: 10px;
     right: 10px;
     width: auto;
+    font-size: 13px;
   }
 
   #panel-body {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 14px;
-    padding-bottom: 12px;
+    gap: 9px 12px;
+    padding-bottom: 10px;
   }
 
   #panel-body .control:first-child {

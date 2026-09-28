@@ -8,7 +8,7 @@ import { buildWorld } from './world';
 import { buildWeather } from './weather';
 
 export const CAMERA_TARGET = new THREE.Vector3(0.5, 1.5, 0);
-const CAM_POS = new THREE.Vector3(46, 30, 53);
+const CAM_POS = new THREE.Vector3(41, 27, 47);
 const MIN_DIST = 32;
 const MAX_DIST = 85;
 const MAX_POLAR = Math.PI * 0.72; // slightly below horizontal — shows underside
@@ -97,6 +97,10 @@ export function createScene(
   const fill = new THREE.DirectionalLight(0xbdd4ee, 0.35);
   fill.position.set(-30, 18, -24);
   scene.add(fill);
+
+  // cool moonlight opposite the sun — carries the night look
+  const moon = new THREE.DirectionalLight(0x9fb8e8, 0);
+  scene.add(moon);
 
   /* ================= world ================= */
   const radial = radialTexture(128);
@@ -187,7 +191,9 @@ export function createScene(
     const sunAngle = (dayT - 0.25) * Math.PI * 2; // 06:00 → rise, 18:00 → set
     const sunH = Math.sin(sunAngle);
     const sunX = Math.cos(sunAngle);
-    sunDir.set(sunX * 0.9, sunH, -0.42).normalize();
+    // negated x/z so the AFTERNOON sun sits on the camera side (+x,+z):
+    // the default view is sunlit, shadows fall away from the viewer
+    sunDir.set(-sunX * 0.9, sunH, 0.42).normalize();
     moonDir.copy(sunDir).multiplyScalar(-1);
 
     const sunUp = clamp01(sunH * 4 + 0.35); // fade near horizon
@@ -208,6 +214,8 @@ export function createScene(
     const moonUp = clamp01(-sunH * 4 + 0.35);
     sky.setMoonPos(moonDir);
     sky.setMoonOpacity(clamp01(moonUp) * (1 - env.storm * 0.8));
+    moon.position.copy(moonDir).multiplyScalar(60);
+    moon.intensity = moonUp * env.duskiness * 1.5 * (1 - env.storm * 0.35);
 
     // ---- sky, fog, background ----
     skyColorMix.setHex(d.fog);
@@ -221,12 +229,12 @@ export function createScene(
 
     // ---- lights ----
     hemi.color.setHex(d.hemisphere);
-    hemi.groundColor.setHex(0x5f7a4a);
-    hemi.intensity = d.hemiIntensity * (1 - env.storm * 0.3);
+    hemi.groundColor.setHex(0x8a9078); // soft fill for the rocky underside
+    hemi.intensity = d.hemiIntensity * (1 - env.storm * 0.2);
     ambient.color.setHex(d.ambient);
-    ambient.intensity = d.ambientIntensity * (1 - env.storm * 0.25);
+    ambient.intensity = d.ambientIntensity * (1 - env.storm * 0.12);
     fill.intensity = 0.35 * (1 - env.duskiness * 0.7);
-    renderer.toneMappingExposure = lerp(1.0, 0.92, env.duskiness) * (1 - env.storm * 0.08);
+    renderer.toneMappingExposure = lerp(1.06, 1.12, env.duskiness) * (1 - env.storm * 0.05);
 
     // ---- stars ----
     const night = clamp01(env.duskiness * 1.2 - 0.25);
@@ -254,10 +262,18 @@ export function createScene(
   }
 
   /* ================= resize ================= */
+  // Widen the FOV on portrait/narrow screens so the island still fits.
+  const applyFov = (): void => {
+    camera.fov =
+      camera.aspect < 1 ? Math.min(72, 42 + (1 - camera.aspect) * 34) : 42;
+  };
+  applyFov();
+
   const onResize = (): void => {
     const w = window.innerWidth;
     const h = window.innerHeight;
     camera.aspect = w / h;
+    applyFov();
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap()));

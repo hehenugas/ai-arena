@@ -1,56 +1,217 @@
 # syntax=docker/dockerfile:1
 
 # ==============================================================================
-# AI Arena — one image, one container, 19 processes
+# AI Arena: one image, one container, 19 processes
 # ==============================================================================
-#   docker compose up -d --build     → http://localhost:8080/
+#   docker compose up -d --build     then open http://localhost:8080/
 #
-# Stage `build`   : npm ci + npm run build for every model listed in
-#                   aggregator/models.json (the same file the dashboard reads,
-#                   so the image always builds what the dashboard advertises).
-# Stage runtime   : caddy:2-alpine + supervisor + busybox httpd. supervisord runs
-#                   one static server per model on ports 5101-5118 (the ports
-#                   PORT_RULES.md documents) plus Caddy as the only router on
-#                   :8080. Only :8080 is published.
+# Why rebuilds are cheap. Every model is built in its OWN stage, with its own
+# cache chain:
 #
-# The static server programs and their ports are generated from the same
-# models.list that was built, so they cannot drift from models.json.
+#   FROM ${NODE_IMAGE} AS m-<id>
+#   COPY <id>/package.json <id>/package-lock.json  ->  npm ci
+#   COPY <id>/                                     ->  npm run build
+#
+# Stages do not depend on each other, so changing one model cannot invalidate any
+# other model, whichever position it sits in this file. Editing the dashboard, a
+# doc or the Caddyfile rebuilds no model at all. npm's download cache lives in a
+# BuildKit cache mount shared by every model, so an npm ci that does have to run
+# stays quick.
+#
+# Adding a model: copy one stage block below, add one COPY --from line to the
+# runtime stage, then register it in aggregator/models.json and both Caddyfiles
+# (PORT_RULES.md, section 3). The supervisord program for it is generated from
+# models.json at build time, so its port cannot drift from the table.
 # ==============================================================================
 
 ARG NODE_IMAGE=node:24-bookworm-slim
 ARG CADDY_IMAGE=caddy:2-alpine
 
-
-# ------------------------------------------------------------------------------
-# Build every model
-# ------------------------------------------------------------------------------
-FROM ${NODE_IMAGE} AS build
-
+# ==============================================================================
+# Stage per model: static bundle into /out
+# ==============================================================================
+# 5101  gemini-3.7-flash
+FROM ${NODE_IMAGE} AS m-gemini-3.7-flash
 WORKDIR /src
-COPY . .
+COPY gemini-3.7-flash/package.json gemini-3.7-flash/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gemini-3.7-flash/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5102  gemini-3.8-flash
+FROM ${NODE_IMAGE} AS m-gemini-3.8-flash
+WORKDIR /src
+COPY gemini-3.8-flash/package.json gemini-3.8-flash/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gemini-3.8-flash/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5103  deepseek-v4.1-flash-coreweave
+FROM ${NODE_IMAGE} AS m-deepseek-v4.1-flash-coreweave
+WORKDIR /src
+COPY deepseek-v4.1-flash-coreweave/package.json deepseek-v4.1-flash-coreweave/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY deepseek-v4.1-flash-coreweave/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5104  deepseek-v4.1-flash-freebuff
+FROM ${NODE_IMAGE} AS m-deepseek-v4.1-flash-freebuff
+WORKDIR /src
+COPY deepseek-v4.1-flash-freebuff/package.json deepseek-v4.1-flash-freebuff/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY deepseek-v4.1-flash-freebuff/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5105  deepseek-v4-flash-0731-coreweave
+FROM ${NODE_IMAGE} AS m-deepseek-v4-flash-0731-coreweave
+WORKDIR /src
+COPY deepseek-v4-flash-0731-coreweave/package.json deepseek-v4-flash-0731-coreweave/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY deepseek-v4-flash-0731-coreweave/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5106  glm-5.2-coreweave
+FROM ${NODE_IMAGE} AS m-glm-5.2-coreweave
+WORKDIR /src
+COPY glm-5.2-coreweave/package.json glm-5.2-coreweave/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY glm-5.2-coreweave/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5107  glm-5.3-flash-coreweave
+FROM ${NODE_IMAGE} AS m-glm-5.3-flash-coreweave
+WORKDIR /src
+COPY glm-5.3-flash-coreweave/package.json glm-5.3-flash-coreweave/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY glm-5.3-flash-coreweave/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5108  glm-5.3-flash-freebuff
+FROM ${NODE_IMAGE} AS m-glm-5.3-flash-freebuff
+WORKDIR /src
+COPY glm-5.3-flash-freebuff/package.json glm-5.3-flash-freebuff/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY glm-5.3-flash-freebuff/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5109  mimo-v2.6-flash
+FROM ${NODE_IMAGE} AS m-mimo-v2.6-flash
+WORKDIR /src
+COPY mimo-v2.6-flash/package.json mimo-v2.6-flash/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY mimo-v2.6-flash/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5110  muse-spark-1.3-opencode
+FROM ${NODE_IMAGE} AS m-muse-spark-1.3-opencode
+WORKDIR /src
+COPY muse-spark-1.3-opencode/package.json muse-spark-1.3-opencode/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY muse-spark-1.3-opencode/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5111  claude-sonnet-4.6-antigravity
+FROM ${NODE_IMAGE} AS m-claude-sonnet-4.6-antigravity
+WORKDIR /src
+COPY claude-sonnet-4.6-antigravity/package.json claude-sonnet-4.6-antigravity/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY claude-sonnet-4.6-antigravity/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5112  claude-opus-4.6-antigravity
+FROM ${NODE_IMAGE} AS m-claude-opus-4.6-antigravity
+WORKDIR /src
+COPY claude-opus-4.6-antigravity/package.json claude-opus-4.6-antigravity/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY claude-opus-4.6-antigravity/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5113  gpt-6-luna-codex
+FROM ${NODE_IMAGE} AS m-gpt-6-luna-codex
+WORKDIR /src
+COPY gpt-6-luna-codex/package.json gpt-6-luna-codex/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gpt-6-luna-codex/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5114  gpt-5.6-luna-codex
+FROM ${NODE_IMAGE} AS m-gpt-5.6-luna-codex
+WORKDIR /src
+COPY gpt-5.6-luna-codex/package.json gpt-5.6-luna-codex/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gpt-5.6-luna-codex/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5115  opus-5.5-cursor
+FROM ${NODE_IMAGE} AS m-opus-5.5-cursor
+WORKDIR /src
+COPY opus-5.5-cursor/package.json opus-5.5-cursor/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY opus-5.5-cursor/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5116  grok-4.7-cursor
+FROM ${NODE_IMAGE} AS m-grok-4.7-cursor
+WORKDIR /src
+COPY grok-4.7-cursor/package.json grok-4.7-cursor/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY grok-4.7-cursor/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5117  space-bunny-cline
+FROM ${NODE_IMAGE} AS m-space-bunny-cline
+WORKDIR /src
+COPY space-bunny-cline/package.json space-bunny-cline/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY space-bunny-cline/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5118  longcat-2.5-opencode
+FROM ${NODE_IMAGE} AS m-longcat-2.5-opencode
+WORKDIR /src
+COPY longcat-2.5-opencode/package.json longcat-2.5-opencode/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY longcat-2.5-opencode/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
 
-RUN set -eux; \
-    node -e 'const m=require("/src/aggregator/models.json");require("fs").writeFileSync("/src/models.list", m.map(x=>x.id+":"+x.port).join("\n")+"\n");console.log("models to build: "+m.length)'; \
-    while IFS=: read -r id port <&3; do \
-      echo "=== build $id (port $port)"; \
-      test -f "/src/$id/package.json"; \
-      ( cd "/src/$id" && npm ci --no-audit --no-fund && npm run build ); \
-    done 3< /src/models.list; \
-    mkdir -p /out/models; \
-    while IFS=: read -r id port <&3; do \
-      test -f "/src/$id/dist/index.html"; \
-      mkdir -p "/out/models/$id"; \
-      cp -a "/src/$id/dist/." "/out/models/$id/"; \
-    done 3< /src/models.list; \
-    du -sh /out/models
+# ==============================================================================
+# Stage: supervisord program per model, straight from models.json
+# ==============================================================================
+FROM ${NODE_IMAGE} AS conf
+COPY aggregator/models.json /src/aggregator/models.json
+COPY docker/gen-models-conf.mjs /gen-models-conf.mjs
+RUN node /gen-models-conf.mjs /src/aggregator/models.json /out/models.conf
 
 
-# ------------------------------------------------------------------------------
-# Serve: Caddy + one static server per model, all under supervisord
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# Runtime: Caddy routes, one static server per model, all under supervisord
+# ==============================================================================
 FROM ${CADDY_IMAGE}
 
+# supervisor 4.x runs the processes; busybox-extras supplies /usr/sbin/httpd,
+# which the base alpine busybox does not ship.
 RUN apk add --no-cache supervisor busybox-extras
+
+COPY --from=conf /out/models.conf /etc/supervisor.d/models.conf
+COPY --from=m-gemini-3.7-flash /out /srv/models/gemini-3.7-flash
+COPY --from=m-gemini-3.8-flash /out /srv/models/gemini-3.8-flash
+COPY --from=m-deepseek-v4.1-flash-coreweave /out /srv/models/deepseek-v4.1-flash-coreweave
+COPY --from=m-deepseek-v4.1-flash-freebuff /out /srv/models/deepseek-v4.1-flash-freebuff
+COPY --from=m-deepseek-v4-flash-0731-coreweave /out /srv/models/deepseek-v4-flash-0731-coreweave
+COPY --from=m-glm-5.2-coreweave /out /srv/models/glm-5.2-coreweave
+COPY --from=m-glm-5.3-flash-coreweave /out /srv/models/glm-5.3-flash-coreweave
+COPY --from=m-glm-5.3-flash-freebuff /out /srv/models/glm-5.3-flash-freebuff
+COPY --from=m-mimo-v2.6-flash /out /srv/models/mimo-v2.6-flash
+COPY --from=m-muse-spark-1.3-opencode /out /srv/models/muse-spark-1.3-opencode
+COPY --from=m-claude-sonnet-4.6-antigravity /out /srv/models/claude-sonnet-4.6-antigravity
+COPY --from=m-claude-opus-4.6-antigravity /out /srv/models/claude-opus-4.6-antigravity
+COPY --from=m-gpt-6-luna-codex /out /srv/models/gpt-6-luna-codex
+COPY --from=m-gpt-5.6-luna-codex /out /srv/models/gpt-5.6-luna-codex
+COPY --from=m-opus-5.5-cursor /out /srv/models/opus-5.5-cursor
+COPY --from=m-grok-4.7-cursor /out /srv/models/grok-4.7-cursor
+COPY --from=m-space-bunny-cline /out /srv/models/space-bunny-cline
+COPY --from=m-longcat-2.5-opencode /out /srv/models/longcat-2.5-opencode
 
 # Installed at /etc/supervisord.conf on purpose: that is the first path
 # supervisorctl searches, so `supervisorctl status` inside the container works
@@ -58,33 +219,13 @@ RUN apk add --no-cache supervisor busybox-extras
 # /run/supervisord.sock, and it would win otherwise.
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/Caddyfile /etc/caddy/Caddyfile
+
+# Also mounted over /srv/aggregator by docker-compose.yml during development, so
+# dashboard edits show up on refresh with no rebuild. Copied last: it changes
+# most often and nothing depends on it.
 COPY aggregator /srv/aggregator
-COPY --from=build /out/models /srv/models
-COPY --from=build /src/models.list /srv/models.list
 
-# One static file server per model. priority=10 keeps them ahead of Caddy
-# (default priority 999) so the routes are listening before the router starts.
-RUN set -eux; \
-    mkdir -p /etc/supervisor.d; \
-    : > /etc/supervisor.d/models.conf; \
-    while IFS=: read -r id port <&3; do \
-      { \
-        echo; \
-        echo "[program:static-$id]"; \
-        echo "command=/usr/sbin/httpd -f -p 127.0.0.1:$port -h /srv/models/$id"; \
-        echo "priority=10"; \
-        echo "autostart=true"; \
-        echo "autorestart=true"; \
-        echo "startsecs=1"; \
-        echo "stopasgroup=true"; \
-        echo "killasgroup=true"; \
-        echo "stdout_logfile=/dev/null"; \
-        echo "redirect_stderr=true"; \
-      } >> /etc/supervisor.d/models.conf; \
-    done 3< /srv/models.list; \
-    rm /srv/models.list; \
-    echo "static servers generated: $(grep -c '^\[program:' /etc/supervisor.d/models.conf)"
-
+# The only port that leaves the container (compose publishes 8080 -> 8080).
 EXPOSE 8080
 
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]

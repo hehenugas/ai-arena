@@ -1,6 +1,6 @@
-# The Dockerfile copies the whole repo once and then builds every model listed in
-# aggregator/models.json, so this file decides how big the build context is.
-# Everything listed here is either regenerated inside the image or has no
+# The Dockerfile copies each model folder by name (plus aggregator/), so nothing
+# here can break the build. This file is only about build context size:
+# everything listed below is either regenerated inside the image or has no
 # business being in a container.
 
 .git
@@ -20,6 +20,6 @@
 **/.DS_Store
 .freebuff
 
-# Docs and orchestration files: not needed by the build stage
+# Docs and orchestration files: never copied into any stage
 docker-compose.yml
 **/README.md

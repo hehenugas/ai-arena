@@ -96,6 +96,13 @@ docker compose down                      # hentikan
 
 - Dashboard tetap di `http://localhost:8080/`. Mau ganti port host:
   `ARENA_PORT=9090 docker compose up -d`.
+- **Build cepat karena cache per model.** Tiap folder punya pasangan layer
+  sendiri: `package.json` + `package-lock.json` untuk `npm ci`, lalu isi
+  foldernya untuk `vite build`. Docker hanya mengulang layer yang input-nya
+  berubah, jadi mengubah satu model membangun ulang model itu saja, dan
+  mengubah dashboard, dokumen, atau Caddyfile tidak membangun ulang model mana
+  pun. Unduhan npm disimpan di cache mount BuildKit yang dipakai bersama oleh
+  18 model, jadi `npm ci` yang memang harus jalan pun cuma hitungan detik.
 - Hanya `:8080` yang di-publish. Static server model bind ke loopback di dalam
   container dan hanya bisa dijangkau Caddy, jadi angka port di tabel atas
   berlaku di dua tempat: mode lokal (host) dan di dalam container.
@@ -103,12 +110,16 @@ docker compose down                      # hentikan
   yang terdaftar di `aggregator/models.json`), `docker/Caddyfile` (upstream-nya
   `127.0.0.1:<port>`) dan `docker/supervisord.conf`.
 - Program supervisord untuk tiap model **digenerate saat build** dari
-  `aggregator/models.json`, jadi port-nya tidak mungkin melenceng dari tabel.
-  Model baru harus didaftarkan di **tiga** tempat: `Caddyfile`,
-  `docker/Caddyfile`, dan `aggregator/models.json`.
+  `aggregator/models.json` oleh `docker/gen-models-conf.mjs`, jadi port-nya tidak
+  mungkin melenceng dari tabel.
+- Model baru harus didaftarkan di **empat** tempat: satu blok build di
+  `Dockerfile` (salin blok model lain, ganti nama foldernya), `Caddyfile`,
+  `docker/Caddyfile`, dan `aggregator/models.json`. Blok di `Dockerfile` sengaja
+  ditulis manual per model supaya cache-nya terpisah seperti di atas.
 - Folder yang ada tapi tidak terdaftar di `models.json` (contoh:
-  `pixel-canary-cline`, belum punya `src/main.ts`) tidak ikut dibangun — tidak
-  seperti loop `*/` yang akan menggagalkan seluruh build.
+  `pixel-canary-cline`, belum punya `src/main.ts`) tidak ikut dibangun. Dockerfile
+  meng-copy folder per nama, bukan `*/`, jadi folder setengah jadi tidak
+  menggagalkan seluruh build.
 - Tunnel Cloudflare (`aggregator/cf-proxy/nginx.conf`) tetap bisa dipakai: ia
   menembak `host.docker.internal:8080`, yaitu port host yang sama dengan yang
   di-publish Caddy.

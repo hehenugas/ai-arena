@@ -387,8 +387,8 @@ export function buildWorld(): WorldParts {
   /* ================= windmill ================= */
 
   const mill = new THREE.Group();
-  const MX = 13.5;
-  const MZ = -8.5;
+  const MX = 12.2;
+  const MZ = -7.2;
 
   const towerPoints: THREE.Vector2[] = [];
   towerPoints.push(new THREE.Vector2(1.1, 0));
@@ -635,47 +635,39 @@ export function buildWorld(): WorldParts {
     group.add(rock);
   }
 
-  // flower dots: tiny instanced crosses of color
-  const flowerColors = [0xf27d9d, 0xf7d154, 0xffffff, 0xd88ef5];
-  const flowerGeo = new THREE.SphereGeometry(0.09, 6, 5);
+  // flower patches: small clusters near the house yard, path bend and pond
+  const flowerColors = [0xf27d9d, 0xf7d154, 0xff9d5c, 0xd88ef5];
+  const flowerGeo = new THREE.SphereGeometry(0.13, 6, 5);
+  const PER = 14;
   const flowerGeos: THREE.InstancedMesh[] = [];
   for (let ci = 0; ci < flowerColors.length; ci++) {
     const mat = new THREE.MeshLambertMaterial({ color: flowerColors[ci] });
     mats.push({ mat, key: 'flower' });
-    const im = new THREE.InstancedMesh(flowerGeo, mat, 26);
-    im.count = 26;
+    const im = new THREE.InstancedMesh(flowerGeo, mat, PER);
     flowerGeos.push(im);
     group.add(im);
   }
   {
+    const anchors: Array<[number, number]> = [
+      [HX + 5.4, HZ + 5.8],
+      [-1.5, 8.8],
+      [POND_X - 6.8, POND_Z + 4.6],
+      [MX - 5.6, MZ + 4.6],
+    ];
     const m4 = new THREE.Matrix4();
-    let placed = 0;
-    let guard = 0;
-    while (placed < flowerColors.length * 26 && guard < 2000) {
-      guard++;
-      const x = (rng() - 0.5) * 2 * (ISLAND_R - 2);
-      const z = (rng() - 0.5) * 2 * (ISLAND_R - 2);
-      if (Math.hypot(x, z) > ISLAND_R - 2.2) continue;
-      if (Math.hypot(x - POND_X, z - POND_Z) < POND_R + 1.1) continue;
-      if (Math.abs(x - HX) < 4.6 && Math.abs(z - HZ) < 4.0) continue;
-      if (Math.hypot(x - MX, z - MZ) < 3.2) continue;
-      // keep off the path corridor (rough check)
-      let onPath = false;
-      for (const p of pathPts) {
-        if (Math.hypot(x - p.x, z - p.z) < 1.15) {
-          onPath = true;
-          break;
-        }
+    for (let ci = 0; ci < flowerColors.length; ci++) {
+      const [ax, az] = anchors[ci % anchors.length];
+      for (let i = 0; i < PER; i++) {
+        const x = ax + (rng() - 0.5) * 4.2;
+        const z = az + (rng() - 0.5) * 4.2;
+        if (Math.hypot(x, z) > ISLAND_R - 2.2) continue;
+        if (Math.hypot(x - POND_X, z - POND_Z) < POND_R + 0.8) continue;
+        if (Math.abs(x - HX) < 4.4 && Math.abs(z - HZ) < 3.8) continue;
+        m4.makeTranslation(x, 0.68, z);
+        flowerGeos[ci].setMatrixAt(i, m4);
       }
-      if (onPath) continue;
-      const ci = placed % flowerColors.length;
-      const im = flowerGeos[ci];
-      const idx = Math.floor(placed / flowerColors.length);
-      m4.makeTranslation(x, 0.66, z);
-      im.setMatrixAt(idx, m4);
-      placed++;
+      flowerGeos[ci].instanceMatrix.needsUpdate = true;
     }
-    for (const im of flowerGeos) im.instanceMatrix.needsUpdate = true;
   }
 
   /* ================= bridge over pond inlet + dock ================= */
