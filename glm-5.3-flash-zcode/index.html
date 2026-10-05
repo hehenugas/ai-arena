@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>Pocket World</title>
+    <meta
+      name="description"
+      content="Pocket World: a tiny floating island diorama you can orbit, weather and light up."
+    />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="scene" aria-label="3D view of a floating island. Drag to orbit."></canvas>
+      <div id="fallback" class="fallback" hidden>
+        <div class="fallback__card" role="alert">
+          <h1>Pocket World needs WebGL</h1>
+          <p>
+            Your browser could not start 3D rendering, so the island cannot be shown. Try a recent
+            version of Chrome, Firefox, Edge or Safari with hardware acceleration enabled.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <aside id="panel" class="panel" aria-label="Pocket World controls">
+      <div class="panel__bar">
+        <div class="brand">
+          <h1 class="brand__title">Pocket World</h1>
+          <p class="brand__sub">A tiny island that lives in your pocket.</p>
+        </div>
+        <button
+          id="panel-toggle"
+          class="panel-toggle"
+          type="button"
+          aria-expanded="true"
+          aria-controls="panel-body"
+        >
+          <span class="panel-toggle__label">Hide</span>
+          <svg class="panel-toggle__icon" viewBox="0 0 12 12" aria-hidden="true">
+            <path
+              d="M2.5 4.5 6 8l3.5-3.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div id="panel-body" class="panel__body">
+        <div class="control">
+          <div class="control__head">
+            <label class="control__label" for="time-slider">Time of day</label>
+            <output id="time-label" class="control__value" for="time-slider">16:00</output>
+          </div>
+          <input
+            id="time-slider"
+            class="slider"
+            type="range"
+            min="0"
+            max="24"
+            step="0.1"
+            value="16"
+            aria-label="Time of day, 24 hour clock"
+          />
+        </div>
+
+        <div class="control">
+          <span class="control__label" id="weather-label">Weather</span>
+          <div class="segmented" role="group" aria-labelledby="weather-label">
+            <button id="weather-clear" class="segmented__btn" type="button" aria-pressed="true">
+              Clear
+            </button>
+            <button id="weather-rain" class="segmented__btn" type="button" aria-pressed="false">
+              Rain
+            </button>
+          </div>
+        </div>
+
+        <div class="control">
+          <div class="control__head">
+            <label class="control__label" for="wind-slider">Wind</label>
+            <output id="wind-label" class="control__value" for="wind-slider">30%</output>
+          </div>
+          <input
+            id="wind-slider"
+            class="slider"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="30"
+            aria-label="Wind strength"
+          />
+        </div>
+
+        <div class="control control--row">
+          <button id="lights-toggle" class="btn" type="button" aria-pressed="false">
+            <span class="btn__dot" aria-hidden="true"></span>
+            House lights: off
+          </button>
+          <button id="reset-btn" class="btn btn--ghost" type="button">Reset</button>
+        </div>
+
+        <p class="hint">Drag to orbit, scroll or pinch to zoom, tap the house to switch its lights.</p>
+      </div>
+    </aside>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
