@@ -36,6 +36,11 @@
 	import route_model grok-4.7-cursor 5116
 	import route_model space-bunny-cline 5117
 	import route_model longcat-2.5-opencode 5118
+	import route_model gpt-6.1-sol-codex 5119
+	import route_model gpt-6-astra-codex 5120
+	import route_model glm-5.3-flash-zcode 5121
+	import route_model ling-3.1-flash-opencode 5122
+	import route_model fledge-alpha-opencode 5123
 
 	# --------------------------------------------------------------------------
 	# Aggregator Dashboard & Static Assets

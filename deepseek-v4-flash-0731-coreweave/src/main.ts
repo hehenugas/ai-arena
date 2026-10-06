@@ -1,88 +1,126 @@
 import * as THREE from 'three';
-import { state, setState, resetState } from './state';
-import { buildScene, updateScene } from './scene';
-import { buildEnvironment } from './environment';
-import { buildWeather } from './weather';
-import { setupControls } from './controls';
-import { initUI } from './ui';
 import './style.css';
+import { state, setState, INITIAL_STATE } from './state';
+import { computeDayCycle } from './environment/dayCycle';
+import { createSky } from './environment/sky';
+import { createLighting } from './environment/lighting';
+import { buildWorld } from './world/builtWorld';
+import { createRain } from './effects/rain';
+import { createRipples } from './effects/ripples';
+import { createCameraRig } from './interaction/camera';
+import { attachHouseClick } from './interaction/houseClick';
+import { createPanel } from './ui/panel';
 
-function run(): void {
-  const app  = document.getElementById('app');
-  const errEl  = document.getElementById('webgl-error');
+function showError(message: string): void {
+  const el = document.getElementById('error')!;
+  el.hidden = false;
+  el.innerHTML = `<div class="card"><h2>Pocket World can't start</h2><p>${message}</p></div>`;
+}
 
-	  let renderer: THREE.WebGLRenderer;
-	  try {
-    renderer  = new THREE.WebGLRenderer({ antialias:	true,	powerPreference:	'high-performance' });
-    if (!renderer.getContext())	throw	new Error('no context');
-  } catch (_) {
-    if (errEl) errEl.hidden  = false;
+function boot(): void {
+  const root = document.getElementById('app')!;
+
+  // WebGL availability check up front — never a blank page.
+  let renderer: THREE.WebGLRenderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  } catch {
+    showError(
+      'WebGL is not supported or is disabled in this browser. Pocket World needs WebGL to render its little island.'
+    );
+    return;
+  }
+  if (!renderer.getContext()) {
+    showError(
+      'WebGL could not initialize. Please enable hardware acceleration or try a different browser.'
+    );
     return;
   }
 
-	  const small  = window.innerWidth <	720;
-	  renderer.setPixelRatio(Math.min(window.devicePixelRatio,	small ?	1.75 :	2.0));
-	  renderer.setSize(window.innerWidth,	window.innerHeight);
-  renderer.shadowMap.enabled  = true;
-  renderer.shadowMap.type  = THREE.PCFSoftShadowMap;
-renderer.toneMapping  = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.6 : 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  root.appendChild(renderer.domElement);
 
-	  if (app) app.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const rig = createCameraRig(renderer.domElement, window.innerWidth, window.innerHeight);
 
-	  const scene  = new THREE.Scene();
-	  scene.background  = new THREE.Color(0x0b1230);
+  const sky = createSky();
+  scene.add(sky);
+  const lighting = createLighting(scene, new THREE.Vector3(1.2, 1.7, 0.0));
+  const world = buildWorld(scene);
+  scene.add(world.group);
 
-	  const camera  = new THREE.PerspectiveCamera(45,	window.innerWidth /	window.innerHeight,	0.1,	130);
-	  camera.position.set(7.2,	3.6,	6.8);
-	  camera.lookAt(0,	0.35,	0);
+  const rain = createRain();
+  scene.add(rain.object);
 
-	  const handles  = buildScene(scene);
-	  const env  = buildEnvironment(scene);
-	  const weather  = buildWeather(scene,	handles.pond);
+  const ripples = createRipples(world.pond.surfaceY);
+  scene.add(ripples.object);
 
-	  const { controls,	update:	controlsUpdate	}  = setupControls(camera,	renderer.domElement,	scene,	() =>	{
-    setState({ lights:	!state.lights });
+  const panel = createPanel(root);
+  panel.onReset(() => {
+    setState({ ...INITIAL_STATE });
+    rig.reset();
+  });
+  attachHouseClick(renderer.domElement, rig.camera, world.house, () => {
+    setState({ houseLights: !state.houseLights });
   });
 
-	  const resetView  = (): void =>	{
-    camera.position.set(7.2,	3.6,	6.8);
-    controls.target.set(0,	0.35,	0);
-  };
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-	  initUI({
-    onTime:	(t) =>	setState({ time:	t }),
-    onWind:	(v) =>	setState({ wind:	v }),
-    onWeather:	(w) =>	{ setState({ weather:	w as 'clear' | 'rain' }); },
-    onLights:	(on) =>	{ setState({ lights:	on }); },
-    onReset:	() =>	{ resetState();	 resetView(); },
-  });
+  // Smooth, interruptible weather factor (0 clear → 1 raining).
+  let weatherT = 0;
+  let elapsed = 0;
 
-	  const clock  = new THREE.Clock();
-	  const reduced  = window.matchMedia('(prefers-reduced-motion:	reduce)').matches;
+  const clock = new THREE.Clock();
+  let last = 0;
 
-	  function loop(): void {
-    requestAnimationFrame(loop);
-    const dt  = Math.min(clock.getDelta(),	0.05);
-    const time  = state.time;
-    const wind  = state.wind;
-    const rain  = weather.rainAmount;
-    env.update(dt,	time,	wind,	rain,reduced);
-    weather.update(dt,wind);
-    updateScene(handles,	dt,	time,	wind,	weather.rainAmount,	state.lights,	reduced);
-    controlsUpdate(dt);
-    renderer.render(scene,camera);
+  function frame(): void {
+    requestAnimationFrame(frame);
+
+    // Time-based animation with a hard clamp on big frame deltas (e.g. after
+    // returning from a background tab).
+    const now = clock.getElapsedTime();
+    const dt = Math.min(now - last, 0.05);
+    last = now;
+    elapsed += dt;
+
+    const cycle = computeDayCycle(state.timeOfDay);
+    const targetWeather = state.weather === 'rain' ? 1 : 0;
+    weatherT += (targetWeather - weatherT) * Math.min(1, dt * 1.6);
+
+    // Environment derived from state.
+    lighting.update(cycle, weatherT, state.houseLights);
+    sky.update(rig.camera, cycle, weatherT);
+
+    // World motion.
+    world.update(dt, elapsed, state.wind, weatherT, reduceMotion);
+    world.house.userData.update(state.houseLights, cycle.night, state.wind);
+    // Windmill sail speed shares the same wind state.
+    world.windmill.blades.rotation.z += state.wind * dt * 2.6;
+    world.pond.update(weatherT, state.wind);
+
+    // Weather effects.
+    rain.update(dt, weatherT, state.wind, ripples.onRainHit);
+    ripples.update(dt, state.wind, weatherT);
+
+    rig.update(dt);
+    rig.controls.update();
+    renderer.render(scene, rig.camera);
   }
+  frame();
 
-	  window.addEventListener('resize', () =>	{
-    camera.aspect  = window.innerWidth /	window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,	window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,	window.innerWidth <	720 ?	1.75 :	2.0));
-  });
-
-	  // first environment pass before the first frame
-	  env.update(0.016,	state.time,	state.wind,	0.0,reduced);
-	  loop();
+  function onResize(): void {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    rig.camera.aspect = w / h;
+    rig.camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
 }
 
-run();
+boot();

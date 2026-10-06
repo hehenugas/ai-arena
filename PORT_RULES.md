@@ -28,6 +28,11 @@ Setiap agen model AI menjalankan dev server atau preview server-nya pada port be
 | 16 | `grok-4.7-cursor` | Grok 4.7 (Cursor) | **5116** | `npx serve -s -l 5116 dist` |
 | 17 | `space-bunny-cline` | Space Bunny (Cline) | **5117** | `npx serve -s -l 5117 dist` |
 | 18 | `longcat-2.5-opencode` | LongCat 2.5 (Opencode) | **5118** | `npx serve -s -l 5118 dist` |
+| 19 | `gpt-6.1-sol-codex` | GPT 6.1 Sol (Codex) | **5119** | `npx serve -s -l 5119 dist` |
+| 20 | `gpt-6-astra-codex` | GPT 6 Astra (Codex) | **5120** | `npx serve -s -l 5120 dist` |
+| 21 | `glm-5.3-flash-zcode` | GLM 5.3 Flash (ZCode) | **5121** | `npx serve -s -l 5121 dist` |
+| 22 | `ling-3.1-flash-opencode` | Ling 3.1 Flash (Opencode) | **5122** | `npx serve -s -l 5122 dist` |
+| 23 | `fledge-alpha-opencode` | Fledge Alpha (Opencode) | **5123** | `npx serve -s -l 5123 dist` |
 
 > [!TIP]
 > **Formula Port**: `5100 + Nomor Urut Model`.
@@ -85,11 +90,11 @@ Pengganti `arena.sh` yang tidak butuh node, tmux, atau caddy di host. Semua
 model dibangun di dalam **satu** image (multi-stage: `npm ci` → `vite build`
 untuk tiap folder), lalu dijalankan di dalam **satu** container oleh supervisord:
 Caddy sebagai router di `:8080` plus satu static server (`busybox httpd`) per
-model di `127.0.0.1:5101-5118` — port yang sama dengan tabel di atas.
+model di `127.0.0.1:5101-5123`, port yang sama dengan tabel di atas.
 
 ```bash
 docker compose up -d --build             # bangun + jalankan
-docker compose exec arena supervisorctl status   # 19 proses: caddy + 18 static
+docker compose exec arena supervisorctl status   # 23 proses: caddy + 22 static
 docker compose logs -f arena             # log router + event supervisord
 docker compose down                      # hentikan
 ```
@@ -102,7 +107,7 @@ docker compose down                      # hentikan
   berubah, jadi mengubah satu model membangun ulang model itu saja, dan
   mengubah dashboard, dokumen, atau Caddyfile tidak membangun ulang model mana
   pun. Unduhan npm disimpan di cache mount BuildKit yang dipakai bersama oleh
-  18 model, jadi `npm ci` yang memang harus jalan pun cuma hitungan detik.
+  22 model, jadi `npm ci` yang memang harus jalan pun cuma hitungan detik.
 - Hanya `:8080` yang di-publish. Static server model bind ke loopback di dalam
   container dan hanya bisa dijangkau Caddy, jadi angka port di tabel atas
   berlaku di dua tempat: mode lokal (host) dan di dalam container.

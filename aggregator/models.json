@@ -42,7 +42,7 @@
     "fallbackPort": null,
     "path": "/deepseek-v4-flash-0731-coreweave/",
     "tag": "DeepSeek",
-    "color": "#7B68EE"
+    "color": "#7B93E8"
   },
   {
     "id": "glm-5.2-coreweave",
@@ -159,5 +159,50 @@
     "fallbackPort": null,
     "path": "/longcat-2.5-opencode/",
     "tag": "LongCat"
+  },
+  {
+    "id": "gpt-6.1-sol-codex",
+    "name": "GPT 6.1 Sol (Codex)",
+    "port": 5119,
+    "fallbackPort": null,
+    "path": "/gpt-6.1-sol-codex/",
+    "tag": "OpenAI",
+    "color": "#10A37F"
+  },
+  {
+    "id": "gpt-6-astra-codex",
+    "name": "GPT 6 Astra (Codex)",
+    "port": 5120,
+    "fallbackPort": null,
+    "path": "/gpt-6-astra-codex/",
+    "tag": "OpenAI",
+    "color": "#10A37F"
+  },
+  {
+    "id": "glm-5.3-flash-zcode",
+    "name": "GLM 5.3 Flash (ZCode)",
+    "port": 5121,
+    "fallbackPort": null,
+    "path": "/glm-5.3-flash-zcode/",
+    "tag": "Zhipu AI",
+    "color": "#7C3AED"
+  },
+  {
+    "id": "ling-3.1-flash-opencode",
+    "name": "Ling 3.1 Flash (Opencode)",
+    "port": 5122,
+    "fallbackPort": null,
+    "path": "/ling-3.1-flash-opencode/",
+    "tag": "Ling",
+    "color": "#0EA5E9"
+  },
+  {
+    "id": "fledge-alpha-opencode",
+    "name": "Fledge Alpha (Opencode)",
+    "port": 5123,
+    "fallbackPort": null,
+    "path": "/fledge-alpha-opencode/",
+    "tag": "Fledge",
+    "color": "#A3E635"
   }
 ]

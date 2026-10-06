@@ -1,39 +1,47 @@
+/**
+ * Coherent application state for time, weather, wind and house lighting.
+ * Every scene effect is derived from this single state object.
+ */
+
 export type Weather = 'clear' | 'rain';
 
 export interface AppState {
-  time: number; // hours, 0..24
+  /** Hours of the day, 0..24. 12 = noon. */
+  timeOfDay: number;
   weather: Weather;
-  wind: number;  // 0..1
-  lights: boolean;
+  /** 0..1 wind strength. */
+  wind: number;
+  houseLights: boolean;
 }
 
-export const state: AppState = {
-  time: 16,
+export const INITIAL_STATE: AppState = {
+  timeOfDay: 16,
   weather: 'clear',
   wind: 0.3,
-  lights: false,
+  houseLights: false,
 };
 
-type Listener = (s: AppState) => void;
+export const state: AppState = { ...INITIAL_STATE };
+
+type Listener = () => void;
 const listeners = new Set<Listener>();
 
 export function setState(patch: Partial<AppState>): void {
   Object.assign(state, patch);
-  emit();
+  listeners.forEach((l) => l());
 }
 
 export function subscribe(fn: Listener): () => void {
   listeners.add(fn);
-  fn(state);
-  return (): void => {
+  return () => {
     listeners.delete(fn);
   };
 }
 
-export function resetState(): void {
-  setState({ time: 16, weather: 'clear', wind: 0.3, lights: false });
-}
-
-function emit(): void {
-  for (const fn of listeners) fn(state);
+export function formatTime(hours: number): string {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  const hh = String(h % 24).padStart(2, '0');
+  const mm = String(m % 60).padStart(2, '0');
+  return `${hh}:${mm}`;
 }

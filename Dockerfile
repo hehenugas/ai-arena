@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ==============================================================================
-# AI Arena: one image, one container, 19 processes
+# AI Arena: one image, one container, 23 processes
 # ==============================================================================
 #   docker compose up -d --build     then open http://localhost:8080/
 #
@@ -175,6 +175,46 @@ COPY longcat-2.5-opencode/ ./
 RUN npm run build \
  && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
 
+FROM ${NODE_IMAGE} AS m-gpt-6.1-sol-codex
+WORKDIR /src
+COPY gpt-6.1-sol-codex/package.json gpt-6.1-sol-codex/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gpt-6.1-sol-codex/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5120  gpt-6-astra-codex
+FROM ${NODE_IMAGE} AS m-gpt-6-astra-codex
+WORKDIR /src
+COPY gpt-6-astra-codex/package.json gpt-6-astra-codex/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY gpt-6-astra-codex/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5121  glm-5.3-flash-zcode
+FROM ${NODE_IMAGE} AS m-glm-5.3-flash-zcode
+WORKDIR /src
+COPY glm-5.3-flash-zcode/package.json glm-5.3-flash-zcode/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY glm-5.3-flash-zcode/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5122  ling-3.1-flash-opencode
+FROM ${NODE_IMAGE} AS m-ling-3.1-flash-opencode
+WORKDIR /src
+COPY ling-3.1-flash-opencode/package.json ling-3.1-flash-opencode/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY ling-3.1-flash-opencode/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5123  fledge-alpha-opencode
+FROM ${NODE_IMAGE} AS m-fledge-alpha-opencode
+WORKDIR /src
+COPY fledge-alpha-opencode/package.json fledge-alpha-opencode/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY fledge-alpha-opencode/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+
 # ==============================================================================
 # Stage: supervisord program per model, straight from models.json
 # ==============================================================================
@@ -212,6 +252,11 @@ COPY --from=m-opus-5.5-cursor /out /srv/models/opus-5.5-cursor
 COPY --from=m-grok-4.7-cursor /out /srv/models/grok-4.7-cursor
 COPY --from=m-space-bunny-cline /out /srv/models/space-bunny-cline
 COPY --from=m-longcat-2.5-opencode /out /srv/models/longcat-2.5-opencode
+COPY --from=m-gpt-6.1-sol-codex /out /srv/models/gpt-6.1-sol-codex
+COPY --from=m-gpt-6-astra-codex /out /srv/models/gpt-6-astra-codex
+COPY --from=m-glm-5.3-flash-zcode /out /srv/models/glm-5.3-flash-zcode
+COPY --from=m-ling-3.1-flash-opencode /out /srv/models/ling-3.1-flash-opencode
+COPY --from=m-fledge-alpha-opencode /out /srv/models/fledge-alpha-opencode
 
 # Installed at /etc/supervisord.conf on purpose: that is the first path
 # supervisorctl searches, so `supervisorctl status` inside the container works
