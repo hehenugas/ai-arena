@@ -204,5 +204,41 @@
     "path": "/fledge-alpha-opencode/",
     "tag": "Fledge",
     "color": "#A3E635"
+  },
+  {
+    "id": "claude-haiku-5.5-claude",
+    "name": "Claude Haiku 5.5 (Claude)",
+    "port": 5124,
+    "fallbackPort": null,
+    "path": "/claude-haiku-5.5-claude/",
+    "tag": "Anthropic",
+    "color": "#EAB308"
+  },
+  {
+    "id": "claude-sonnet-5.5-claude",
+    "name": "Claude Sonnet 5.5 (Claude)",
+    "port": 5125,
+    "fallbackPort": null,
+    "path": "/claude-sonnet-5.5-claude/",
+    "tag": "Anthropic",
+    "color": "#F97316"
+  },
+  {
+    "id": "claude-opus-5.5-claude",
+    "name": "Claude Opus 5.5 (Claude)",
+    "port": 5126,
+    "fallbackPort": null,
+    "path": "/claude-opus-5.5-claude/",
+    "tag": "Anthropic",
+    "color": "#9333EA"
+  },
+  {
+    "id": "kimi-k3-workbuddy",
+    "name": "Kimi K3 (WorkBuddy)",
+    "port": 5127,
+    "fallbackPort": null,
+    "path": "/kimi-k3-workbuddy/",
+    "tag": "Moonshot AI",
+    "color": "#06B6D4"
   }
 ]

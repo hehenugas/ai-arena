@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ==============================================================================
-# AI Arena: one image, one container, 23 processes
+# AI Arena: one image, one container, 28 processes
 # ==============================================================================
 #   docker compose up -d --build     then open http://localhost:8080/
 #
@@ -214,6 +214,38 @@ RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no
 COPY fledge-alpha-opencode/ ./
 RUN npm run build \
  && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5124  claude-haiku-5.5-claude
+FROM ${NODE_IMAGE} AS m-claude-haiku-5.5-claude
+WORKDIR /src
+COPY claude-haiku-5.5-claude/package.json claude-haiku-5.5-claude/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY claude-haiku-5.5-claude/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5125  claude-sonnet-5.5-claude
+FROM ${NODE_IMAGE} AS m-claude-sonnet-5.5-claude
+WORKDIR /src
+COPY claude-sonnet-5.5-claude/package.json claude-sonnet-5.5-claude/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY claude-sonnet-5.5-claude/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5126  claude-opus-5.5-claude
+FROM ${NODE_IMAGE} AS m-claude-opus-5.5-claude
+WORKDIR /src
+COPY claude-opus-5.5-claude/package.json claude-opus-5.5-claude/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY claude-opus-5.5-claude/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
+# 5127  kimi-k3-workbuddy
+FROM ${NODE_IMAGE} AS m-kimi-k3-workbuddy
+WORKDIR /src
+COPY kimi-k3-workbuddy/package.json kimi-k3-workbuddy/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
+COPY kimi-k3-workbuddy/ ./
+RUN npm run build \
+ && rm -rf /out && mkdir -p /out && cp -a dist/. /out/
 
 # ==============================================================================
 # Stage: supervisord program per model, straight from models.json
@@ -257,6 +289,10 @@ COPY --from=m-gpt-6-astra-codex /out /srv/models/gpt-6-astra-codex
 COPY --from=m-glm-5.3-flash-zcode /out /srv/models/glm-5.3-flash-zcode
 COPY --from=m-ling-3.1-flash-opencode /out /srv/models/ling-3.1-flash-opencode
 COPY --from=m-fledge-alpha-opencode /out /srv/models/fledge-alpha-opencode
+COPY --from=m-claude-haiku-5.5-claude /out /srv/models/claude-haiku-5.5-claude
+COPY --from=m-claude-sonnet-5.5-claude /out /srv/models/claude-sonnet-5.5-claude
+COPY --from=m-claude-opus-5.5-claude /out /srv/models/claude-opus-5.5-claude
+COPY --from=m-kimi-k3-workbuddy /out /srv/models/kimi-k3-workbuddy
 
 # Installed at /etc/supervisord.conf on purpose: that is the first path
 # supervisorctl searches, so `supervisorctl status` inside the container works
