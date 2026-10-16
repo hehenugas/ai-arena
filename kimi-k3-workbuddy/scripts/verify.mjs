@@ -49,7 +49,12 @@ await page.screenshot({ path: `${out}/3-sunset.png` });
 // 4. night + rain + lights on
 await page.locator('#time-slider').fill('1320'); // 22:00
 await page.locator('#weather-rain').click();
-await page.locator('#lights-toggle').check();
+// the real checkbox is visually hidden off-viewport behind the switch styling,
+// so Playwright's actionability checks never pass; click it via the DOM instead
+await page.evaluate(() => {
+  const el = document.getElementById('lights-toggle');
+  if (!el.checked) el.click();
+});
 await page.locator('#wind-slider').fill('70');
 await page.waitForTimeout(2500);
 await page.screenshot({ path: `${out}/4-night-rain.png` });

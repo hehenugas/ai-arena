@@ -200,7 +200,7 @@ function animate(): void {
   sun.color.copy(env.sunColor);
   sun.intensity = env.sunIntensity * rainDim + env.nightness * 0.25;
   ambient.color.copy(env.ambientColor);
-  ambient.intensity = env.ambientIntensity * rainDim + env.nightness * 0.15;
+  ambient.intensity = env.ambientIntensity * rainDim + env.nightness * 0.4;
   (scene.fog as THREE.FogExp2).color.copy(env.skyBottom);
   (scene.fog as THREE.FogExp2).density = env.fogDensity + rainMix * 0.012;
   applyEnvToSky(sky.uniforms, env, sunDir);
